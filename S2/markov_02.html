@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Engin Şengel">
 
-<title>markov_02</title>
+<title>Can a Two-State Markov-Switching Mechanism Reproduce SPY’s Stylised Facts?</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -26,41 +27,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -76,86 +42,258 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="markov_02_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="markov_02_files/libs/bootstrap/bootstrap-215b371544c282197b31c8aa00ce3677.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
-<body class="fullcontent quarto-light">
+<body class="quarto-light">
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="markov_02.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
 <main class="content" id="quarto-document-content">
 
-
-
-
-<div id="712242aa" class="cell" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> yfinance <span class="im">as</span> yf</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd </span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy <span class="im">import</span>  stats</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.graphics.tsaplots <span class="im">import</span> plot_acf</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> norm</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Can a Two-State Markov-Switching Mechanism Reproduce SPY’s Stylised Facts?</h1>
 </div>
-<ol type="1">
-<li><p>Research question</p></li>
-<li><p>Markov-chain simulation</p></li>
-<li><p>Transition-matrix estimation</p></li>
-<li><p>Stationary distribution</p></li>
-<li><p>Regime durations</p></li>
-<li><p>Convergence experiment</p></li>
-<li><p>Markov-switching return generatorx</p></li>
-<li><p>Synthetic diagnostics</p></li>
-<li><p>SPY–synthetic comparison</p></li>
-<li><p>Sensitivity experiment</p></li>
-<li><p>Conclusion</p></li>
-<li><p>Sonuç paragrafında cevaplayacağın sorular</p></li>
-</ol>
-<p>Kendi sonuçlarına göre şunları yaz:</p>
-<p>Model raw-return ACF’sinin düşük olmasını üretti mi? Absolute-return ACF’sinde pozitif kalıcılık üretti mi? Pozitif excess kurtosis üretti mi? SPY’ın 9.48 kurtosis değerine ulaştı mı? Sentetik volatilite hafızası SPY’dan daha kısa mı? Hangi parametre hangi özelliği değiştirdi? Model neden henüz gerçek SPY modeli olarak kabul edilemez?</p>
-<p>ilk hafta volatilite kümelenmesi olduğu görüldü ve getirinin bir tane normal dağılımdan değil 2 tane biri yüksek varyanslı biri küçük varyanslı olacak şekilde iç içe geçmiş dağılımdan gelmiş olabileceği varsayıldı</p>
-<p>Gösterebilir: İki durumlu mekanizma bu istatistikleri üretebiliyor.</p>
-<p>Başta bir bir transation matris bulucam ondan sonrasında ona 1 0 dizisi ürettirip sentetikle test ediyoruz</p>
-<div id="15ffd864" class="cell" data-execution_count="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>P_matrice <span class="op">=</span> np.array([[<span class="fl">0.95</span>, <span class="fl">0.05</span>],</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>              [<span class="fl">0.20</span>, <span class="fl">0.80</span>]])</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#0 : low volatility</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#1 : high volatility</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">94</span>)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(seed <span class="op">=</span> <span class="dv">94</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> simulate_chain(P,n,s0,rng):</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    states <span class="op">=</span> np.zeros(n, dtype <span class="op">=</span> <span class="bu">int</span>)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    states[<span class="dv">0</span>] <span class="op">=</span> s0</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    number_of_states <span class="op">=</span> P.shape[<span class="dv">0</span>] <span class="co"># satir sayisi</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,n):</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        current_state <span class="op">=</span> states[i<span class="op">-</span><span class="dv">1</span>]</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        transition_probs <span class="op">=</span> P[current_state]</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        states[i] <span class="op">=</span> rng.choice(number_of_states, p <span class="op">=</span> transition_probs)</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> states</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Engin Şengel </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="abstract" class="level2">
+<h2 class="anchored" data-anchor-id="abstract">Abstract</h2>
+<p>Report 1 found fat tails and volatility clustering in weekly SPY returns and proposed a two-state variance structure, but did not test it. This report builds that structure directly: a two-state Markov chain switches the variance of a Gaussian return, with parameters chosen by hand rather than estimated. The synthetic series reproduces all three stylised facts in sign — no autocorrelation in raw returns, positive autocorrelation in absolute returns, and excess kurtosis of 6.84 against 9.48 for SPY — but its volatility memory fades much faster than the memory in the real data.</p>
+</section>
+<section id="purpose" class="level2">
+<h2 class="anchored" data-anchor-id="purpose">1. Purpose</h2>
+<p>Report 1 described weekly SPY log returns from 2000 to 2019 and found two things. Raw returns showed almost no autocorrelation, while absolute and squared returns stayed correlated for many weeks. The return distribution had an excess kurtosis of 9.48, far above the Gaussian value of zero. From these facts the report suggested that returns may come from a mixture of two normal distributions with a common mean and different variances. That was a suggestion, not a result.</p>
+<p>This report tests the suggestion in the simplest possible way. Instead of fitting a model to SPY, it builds one and looks at what the model produces. A two-state Markov chain decides which variance is active in a given week, and a Gaussian shock turns that variance into a return. The question is whether this mechanism, on its own, can generate the same stylised facts. If it cannot, the two-state idea is already in trouble. If it can, the remaining question is whether the real data actually prefer it, and that requires estimation rather than simulation.</p>
+</section>
+<section id="model" class="level2">
+<h2 class="anchored" data-anchor-id="model">2. Model</h2>
+<section id="the-chain" class="level3">
+<h3 class="anchored" data-anchor-id="the-chain">2.1 The Chain</h3>
+<p><span class="math inline">\(P\)</span> is a Markov matrix, where each state represents a volatility regime and each entry a switching probability. The probability of moving from state <span class="math inline">\(i\)</span> to state <span class="math inline">\(j\)</span> is written <span class="math inline">\(p_{ij}\)</span>. Each row sums to 1 because the system must move to one of the available states. In this model the probability of moving from low volatility to high volatility is 0.05, and from high volatility to low volatility is 0.20. These values were set by hand rather than estimated from the data; Section 4 explains where they came from and Section 6 shows how much the results depend on them.</p>
+</section>
+<section id="the-observation-equation" class="level3">
+<h3 class="anchored" data-anchor-id="the-observation-equation">2.2 The Observation Equation</h3>
+<p>The latent volatility state is linked to the observed weekly log return through</p>
+<p><span class="math display">\[
+r_t = \mu + \sigma_{S_t}\varepsilon_t,
+\qquad
+\varepsilon_t \overset{\mathrm{iid}}{\sim} \mathcal{N}(0,1).
+\]</span></p>
+<p>Here, <span class="math inline">\(S_t \in \{0,1\}\)</span> denotes the unobserved volatility regime, <span class="math inline">\(\mu\)</span> is the common weekly mean return, and <span class="math inline">\(\sigma_{S_t}\)</span> is the regime-dependent standard deviation. Conditional on the current regime,</p>
+<p><span class="math display">\[
+r_t \mid S_t = 0 \sim \mathcal{N}(\mu,\sigma_0^2),
+\]</span></p>
+<p>and</p>
+<p><span class="math display">\[
+r_t \mid S_t = 1 \sim \mathcal{N}(\mu,\sigma_1^2).
+\]</span></p>
+<p>In the simulation, <span class="math inline">\(\sigma_0 = 0.013\)</span> represents the low-volatility regime, while <span class="math inline">\(\sigma_1 = 0.052\)</span> represents the high-volatility regime.</p>
+<p>A common mean is imposed because the initial SPY analysis showed little autocorrelation in raw returns but persistent autocorrelation in absolute and squared returns. The model therefore places regime dependence in the conditional variance rather than in the conditional mean. Although the Gaussian shocks are serially independent, persistence in <span class="math inline">\(S_t\)</span> produces clusters of large and small return magnitudes over time.</p>
+</section>
+<section id="implied-moments" class="level3">
+<h3 class="anchored" data-anchor-id="implied-moments">2.3 Implied Moments</h3>
+<p>Under the stationary distribution <span class="math inline">\(\boldsymbol{\pi}=(0.8,0.2)\)</span>, a randomly selected week belongs to the low-volatility regime with probability <span class="math inline">\(\pi_0=0.8\)</span> and to the high-volatility regime with probability <span class="math inline">\(\pi_1=0.2\)</span>.</p>
+<p>Because both regimes have the same conditional mean, the unconditional expected return is</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathbb{E}[r_t]
+&amp;=
+\sum_{i=0}^{1}
+\pi_i\mathbb{E}[r_t\mid S_t=i] \\
+&amp;=
+\pi_0\mu+\pi_1\mu \\
+&amp;=
+\mu.
+\end{aligned}
+\]</span></p>
+<p>Using the law of total variance,</p>
+<p><span class="math display">\[
+\operatorname{Var}(r_t)
+=
+\mathbb{E}\left[\operatorname{Var}(r_t\mid S_t)\right]
++
+\operatorname{Var}\left(\mathbb{E}[r_t\mid S_t]\right).
+\]</span></p>
+<p>The second term is zero because the conditional mean is <span class="math inline">\(\mu\)</span> in both regimes. Therefore,</p>
+<p><span class="math display">\[
+\operatorname{Var}(r_t)
+=
+\pi_0\sigma_0^2+\pi_1\sigma_1^2.
+\]</span></p>
+<p>Using <span class="math inline">\(\pi_0=0.8\)</span>, <span class="math inline">\(\pi_1=0.2\)</span>, <span class="math inline">\(\sigma_0=0.013\)</span>, and <span class="math inline">\(\sigma_1=0.052\)</span> gives</p>
+<p><span class="math display">\[
+\begin{aligned}
+\operatorname{Var}(r_t)
+&amp;=
+0.8(0.013)^2+0.2(0.052)^2 \\
+&amp;=
+0.000676.
+\end{aligned}
+\]</span></p>
+<p>Hence, the implied weekly standard deviation is</p>
+<p><span class="math display">\[
+\operatorname{Std}(r_t)
+=
+\sqrt{0.000676}
+=
+0.026.
+\]</span></p>
+<p>Although returns are conditionally Gaussian within each regime, their unconditional distribution is a Gaussian mixture. For a Gaussian variable, the fourth central moment is</p>
+<p><span class="math display">\[
+\mathbb{E}\left[(r_t-\mu)^4\mid S_t=i\right]
+=
+3\sigma_i^4.
+\]</span></p>
+<p>Therefore, the unconditional fourth central moment is</p>
+<p><span class="math display">\[
+\mathbb{E}\left[(r_t-\mu)^4\right]
+=
+3\left(\pi_0\sigma_0^4+\pi_1\sigma_1^4\right).
+\]</span></p>
+<p>The implied kurtosis is consequently</p>
+<p><span class="math display">\[
+\operatorname{Kurt}(r_t)
+=
+\frac{
+3\left(\pi_0\sigma_0^4+\pi_1\sigma_1^4\right)
+}{
+\left(\pi_0\sigma_0^2+\pi_1\sigma_1^2\right)^2
+}.
+\]</span></p>
+<p>Substituting the model parameters gives</p>
+<p><span class="math display">\[
+\operatorname{Kurt}(r_t)
+=
+\frac{
+3\left[0.8(0.013)^4+0.2(0.052)^4\right]
+}{
+(0.000676)^2
+}
+=
+9.75.
+\]</span></p>
+<p>Since a Gaussian distribution has kurtosis equal to <span class="math inline">\(3\)</span>, the implied excess kurtosis is</p>
+<p><span class="math display">\[
+\operatorname{Excess\ Kurtosis}(r_t)
+=
+9.75-3
+=
+6.75.
+\]</span></p>
+<p>The model therefore produces an overall weekly standard deviation of <span class="math inline">\(0.026\)</span> and positive excess kurtosis even though returns are Gaussian conditional on each regime. Note, however, that the implied excess kurtosis of <span class="math inline">\(6.75\)</span> is already below the empirical SPY value of <span class="math inline">\(9.48\)</span>. This is a property of the chosen parameters, not of the simulation: even a perfect simulation of this model cannot match the observed tail heaviness.</p>
+</section>
+</section>
+<section id="chain-verification" class="level2">
+<h2 class="anchored" data-anchor-id="chain-verification">3. Chain Verification</h2>
+<p>Before the chain is used to generate returns, it is worth checking that the simulation actually reproduces the matrix it was given. Three quantities can be compared against values that are known in closed form.</p>
+<p>The first is the transition matrix itself. Counting how often the simulated path moves from state <span class="math inline">\(i\)</span> to state <span class="math inline">\(j\)</span> and dividing by the number of visits to state <span class="math inline">\(i\)</span> gives <span class="math inline">\(\hat{P}\)</span>, which should be close to <span class="math inline">\(P\)</span>.</p>
+<p>The second is the stationary distribution <span class="math inline">\(\boldsymbol{\pi}\)</span>, the long-run share of time spent in each state. It solves <span class="math inline">\(\boldsymbol{\pi}P =
+\boldsymbol{\pi}\)</span> subject to <span class="math inline">\(\sum_i \pi_i = 1\)</span>, which is a small linear system. The share of simulated weeks spent in each state should approach it.</p>
+<p>The third is the expected time spent in a regime before leaving it. Once the chain is in state <span class="math inline">\(i\)</span>, each week it stays with probability <span class="math inline">\(p_{ii}\)</span> and leaves with probability <span class="math inline">\(1-p_{ii}\)</span>, independently of how long it has already been there. The number of weeks until it leaves is therefore geometric, and its mean is</p>
+<p><span class="math display">\[
+\mathbb{E}[T_i] = \frac{1}{1-p_{ii}}.
+\]</span></p>
+<p>This gives 20 weeks for the low-volatility state and 5 weeks for the high-volatility state. The memoryless property is an assumption of the model, not a fact about markets, and it is one of the things a richer model would relax. The three checks are summarised in <a href="#tbl-verification" class="quarto-xref">Table&nbsp;1</a>.</p>
+<div id="tbl-verification" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-verification-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Checks used to verify the simulated chain
+</figcaption>
+<div aria-describedby="tbl-verification-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Quantity</th>
+<th style="text-align: left;">Theoretical (Model)</th>
+<th style="text-align: left;">Empirical (Simulation)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Transition matrix</strong></td>
+<td style="text-align: left;"><span class="math inline">\(P\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\hat{P}\)</span> from state counts</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Stationary distribution</strong></td>
+<td style="text-align: left;"><span class="math inline">\(\boldsymbol{\pi}\)</span> from the linear system</td>
+<td style="text-align: left;">share of weeks in each state</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Expected sojourn time</strong></td>
+<td style="text-align: left;"><span class="math inline">\(\mathbb{E}[T_i] = 1/(1-p_{ii})\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(1/(1-\hat{p}_{ii})\)</span></td>
+</tr>
+</tbody>
+</table>
 </div>
-<div id="9b19e0b9" class="cell" data-execution_count="5">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>spy_weekly_data <span class="op">=</span> pd.read_csv(<span class="st">"../data/customized_spy_data_2000-2019.csv"</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>spy_data_size <span class="op">=</span> <span class="bu">len</span>(spy_weekly_data[<span class="st">"Log_Return"</span>].dropna())</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>state_chain <span class="op">=</span> simulate_chain(P_matrice, spy_data_size, <span class="dv">0</span>, rng)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">8</span>))</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="bu">range</span>(<span class="dv">300</span>), state_chain[:<span class="dv">300</span>], label <span class="op">=</span> <span class="st">"Markov P Matrice States"</span>, color <span class="op">=</span> <span class="st">"darkblue"</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Chain Plot"</span>)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Index"</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"States"</span>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>states, counts <span class="op">=</span> np.unique(state_chain, return_counts<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>count_result <span class="op">=</span> <span class="bu">dict</span>(<span class="bu">zip</span>(states.tolist(), counts.tolist()))</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(count_result)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</figure>
+</div>
+<div id="cell-fig-chain" class="cell" data-execution_count="53">
 <div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="markov_02_files/figure-html/cell-4-output-1.png" class="img-fluid figure-img"></p>
+<div id="fig-chain" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-chain-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="markov_02_files/figure-html/fig-chain-output-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-chain-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: First 300 weeks of the simulated regime sequence. State 0 is low volatility, state 1 is high volatility.
+</figcaption>
 </figure>
 </div>
 </div>
@@ -163,24 +301,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>{0: 796, 1: 247}</code></pre>
 </div>
 </div>
-<div id="af0e17cb" class="cell" data-execution_count="6">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>today <span class="op">=</span> state_chain[:<span class="op">-</span><span class="dv">1</span>]</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>tomorrow <span class="op">=</span> state_chain[<span class="dv">1</span>:]</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>N00 <span class="op">=</span> np.<span class="bu">sum</span>((today <span class="op">==</span> <span class="dv">0</span> ) <span class="op">&amp;</span> (tomorrow<span class="op">==</span><span class="dv">0</span> ))</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>N01 <span class="op">=</span> np.<span class="bu">sum</span>((today <span class="op">==</span> <span class="dv">0</span> ) <span class="op">&amp;</span> (tomorrow <span class="op">==</span> <span class="dv">1</span>))</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>N10 <span class="op">=</span> np.<span class="bu">sum</span>((today <span class="op">==</span> <span class="dv">1</span>) <span class="op">&amp;</span> (tomorrow <span class="op">==</span> <span class="dv">0</span>))</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>N11 <span class="op">=</span> np.<span class="bu">sum</span>((today <span class="op">==</span> <span class="dv">1</span> ) <span class="op">&amp;</span> (tomorrow <span class="op">==</span> <span class="dv">1</span>))</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>N_matrice <span class="op">=</span> np.array([[N00,N01],</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>                      [N10,N11]])</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Calculated Matrice:</span><span class="ch">\n</span><span class="ss"> </span><span class="sc">{</span>N_matrice<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>sum_of_rows <span class="op">=</span> N_matrice.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>,keepdims<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>P_hat <span class="op">=</span> N_matrice <span class="op">/</span> sum_of_rows</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Real P:</span><span class="ch">\n</span><span class="st">"</span>, P_matrice)</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Estimated P-hat:</span><span class="ch">\n</span><span class="st">"</span>, P_hat)</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Differance (P-hat - P):</span><span class="ch">\n</span><span class="st">"</span>, P_hat <span class="op">-</span> P_matrice)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="af0e17cb" class="cell" data-execution_count="54">
 <div class="cell-output cell-output-stdout">
 <pre><code>Calculated Matrice:
  [[755  41]
@@ -199,59 +320,18 @@ Differance (P-hat - P):
  [-0.03739837  0.03739837]]</code></pre>
 </div>
 </div>
-<div id="212f9d85" class="cell" data-execution_count="7">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Stationary Distributionu bulma</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># sQ = s</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> P_matrice.shape[<span class="dv">0</span>]</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> P_matrice.T <span class="op">-</span> np.eye(n)</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> np.zeros(n)</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>A[<span class="op">-</span><span class="dv">1</span>, :] <span class="op">=</span> <span class="dv">1</span>  <span class="co">#normalize ediliyor</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>b[<span class="op">-</span><span class="dv">1</span>] <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> np.linalg.solve(A,b)</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Stationary distribution:"</span>, s)</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"sQ:"</span>, s <span class="op">@</span> P_matrice)</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"sQ = s :"</span>, np.allclose(s <span class="op">@</span> P_matrice, s))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="212f9d85" class="cell" data-execution_count="55">
 <div class="cell-output cell-output-stdout">
 <pre><code>Stationary distribution: [0.8 0.2]
 sQ: [0.8 0.2]
-sQ = s : True</code></pre>
+sQ = s : True
+
+--- PI (STATIONARY) COMPARISON ---
+Empirical Pi (State 0): 0.7632 | Theoretical s[0]: 0.8000
+Empirical Pi (State 1): 0.2368 | Theoretical s[1]: 0.2000</code></pre>
 </div>
 </div>
-<div id="a5fdabfd" class="cell" data-execution_count="8">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Ortalama Rejim kalım süresi geometrik hesaplanır çünkü mantıken düşündüğümüzde rejimin bir duruma gelmesi geometrik dağılır 0. rejimdeysek 1 e geçme olasılıgımız kaç denenin sonunda geçtiğimiz geometrik dağılımın sorusudur.</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">#X ~ Geom(p) ise E(X) = 1/1-pii dir proof omitted. pii - &gt; rejimde kalma , 1-pii rejimdden cıkma </span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Markov swithchinge göre  memoryless bir yapı var olasılık gerçekten sahip mi yoksa rejimde durdurkça değişiyor mu </span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Model-implied durations using the true transition matrix</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>theoretical_low_duration <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">-</span> P_matrice[<span class="dv">0</span>, <span class="dv">0</span>])</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>theoretical_high_duration <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">-</span> P_matrice[<span class="dv">1</span>, <span class="dv">1</span>])</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Empirical durations using transition counts</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>empirical_low_duration <span class="op">=</span> (N00 <span class="op">+</span> N01) <span class="op">/</span> N01</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>empirical_high_duration <span class="op">=</span> (N10 <span class="op">+</span> N11) <span class="op">/</span> N10</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Durations implied by the estimated transition matrix</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>estimated_low_duration <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">-</span> P_hat[<span class="dv">0</span>, <span class="dv">0</span>])</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>estimated_high_duration <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">-</span> P_hat[<span class="dv">1</span>, <span class="dv">1</span>])</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">--- REGIME DURATIONS ---"</span>)</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Theoretical low-vol duration : </span><span class="sc">{</span>theoretical_low_duration<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Empirical low-vol duration   : </span><span class="sc">{</span>empirical_low_duration<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"P-hat low-vol duration       : </span><span class="sc">{</span>estimated_low_duration<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">45</span>)</span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Theoretical high-vol duration: </span><span class="sc">{</span>theoretical_high_duration<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Empirical high-vol duration  : </span><span class="sc">{</span>empirical_high_duration<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"P-hat high-vol duration      : </span><span class="sc">{</span>estimated_high_duration<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="a5fdabfd" class="cell" data-execution_count="56">
 <div class="cell-output cell-output-stdout">
 <pre><code>
 --- REGIME DURATIONS ---
@@ -264,150 +344,245 @@ Empirical high-vol duration  : 6.1500
 P-hat high-vol duration      : 6.1500</code></pre>
 </div>
 </div>
-<div id="a7316cd2" class="cell" data-execution_count="9">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Şimdi bu rejimlerden markov switching modelini kullanarak 2 rejimli sistemden haftalık return elde edicem. 1040 hafta üzerinden bir return oluşturmak istiyorum markov switching model oalrak da rt = mu +std(st)Z(0,1) kullanıcam</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>logReturn_mean <span class="op">=</span> spy_weekly_data[<span class="st">"Log_Return"</span>].mean()</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>low_vol_average_std <span class="op">=</span> <span class="fl">0.013</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>high_vol_average_std <span class="op">=</span> <span class="fl">0.052</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> markov_switching_return(mu, low_vol,high_vol,regime,seed <span class="op">=</span> <span class="dv">94</span>):</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    local_rng <span class="op">=</span> np.random.default_rng(seed) </span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    local_noise <span class="op">=</span> local_rng.normal(loc <span class="op">=</span> <span class="dv">0</span>, scale <span class="op">=</span> <span class="dv">1</span>, size <span class="op">=</span> <span class="bu">len</span>(regime))</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    volatility_array <span class="op">=</span> np.where(state_chain <span class="op">==</span> <span class="dv">0</span>, low_vol_average_std, high_vol_average_std)</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    log_return_array <span class="op">=</span> logReturn_mean <span class="op">+</span> (volatility_array <span class="op">*</span> local_noise)</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> log_return_array</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>log_return_array <span class="op">=</span> markov_switching_return(logReturn_mean,low_vol_average_std,high_vol_average_std,state_chain)</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(log_return_array)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="verification-results" class="level3">
+<h3 class="anchored" data-anchor-id="verification-results">3.1 Verification results</h3>
+<p>The chain was simulated for 1043 weeks, the same length as the SPY sample. Of these, 796 weeks fell in the low-volatility state and 247 in the high-volatility state. <a href="#fig-chain" class="quarto-xref">Figure&nbsp;1</a> plots the first 300 weeks of the path and shows the shape the transition matrix produces: long stretches in the low state broken by short bursts in the high state.</p>
+<p>The estimated matrix is close to the true one in the first row and less close in the second: <span class="math inline">\(\hat{p}_{00} = 0.948\)</span> against <span class="math inline">\(0.95\)</span>, but <span class="math inline">\(\hat{p}_{11} =
+0.837\)</span> against <span class="math inline">\(0.80\)</span>. This difference is expected. The first row is estimated from 796 transitions and the second from only 246, so the second row carries much more sampling noise.</p>
+<p>The other two checks show the same pattern. The simulated share of low-volatility weeks is 0.763 against a theoretical 0.800. The mean time in the low state is 19.4 weeks against 20, and in the high state 6.2 weeks against 5. One point should be stated plainly: the sojourn times printed as “empirical” are computed from the same transition counts as <span class="math inline">\(\hat{P}\)</span>, so they are algebraically identical to <span class="math inline">\(1/(1-\hat{p}_{ii})\)</span> and are not an independent check. They are reported because they translate the matrix into weeks, which is easier to judge by eye.</p>
+<p>None of these gaps suggests a coding error. They are the size one would expect from a single path of this length, and they shrink in the 50,000-week simulation used in Section 5.2. The chain behaves as the model says it should, so it can now be used to generate returns.</p>
+</section>
+</section>
+<section id="calibration" class="level2">
+<h2 class="anchored" data-anchor-id="calibration">4. Calibration</h2>
+<p>Crucially, the parameters governing the Markov-switching model—both the transition probabilities and the state-dependent volatilities—were not strictly estimated from the empirical SPY data using formal statistical techniques such as Maximum Likelihood Estimation (MLE). Instead, they were heuristically calibrated based on a visual inspection of the SPY rolling volatility graph presented in the initial analysis.</p>
+<p>The conditional standard deviations, <span class="math inline">\(\sigma_0 = 0.013\)</span> and <span class="math inline">\(\sigma_1 = 0.052\)</span>, were selected by eye to approximate the baseline tranquility of the market and the extreme spikes observed during crisis periods, respectively. Similarly, the transition probabilities <span class="math inline">\(p_{00} = 0.95\)</span> and <span class="math inline">\(p_{11} = 0.80\)</span> were chosen manually to reflect a well-known market stylized fact: low-volatility bull markets are highly persistent, whereas high-volatility distress periods are severe but relatively short-lived.</p>
+<p>Because these parameters are purely illustrative rather than empirically optimized, any discrepancies between the synthetic series and the actual SPY data must be interpreted with caution. This distinction between <em>model structure</em> and <em>parameter selection</em> forms the core of the discussion in Section 7.</p>
+</section>
+<section id="results" class="level2">
+<h2 class="anchored" data-anchor-id="results">5. Results</h2>
+<section id="diagnostics-of-the-synthetic-series" class="level3">
+<h3 class="anchored" data-anchor-id="diagnostics-of-the-synthetic-series">5.1 Diagnostics of the synthetic series</h3>
+<p>The state sequence from Section 3 is now turned into returns using <span class="math inline">\(r_t = \mu + \sigma_{S_t}\varepsilon_t\)</span>. The mean <span class="math inline">\(\mu\)</span> is set to the sample mean of SPY weekly log returns, so that only the variance behaviour is being tested. The Gaussian shocks are drawn independently of each other and of the chain. This matters for the interpretation of everything below: all of the memory in the synthetic series comes from the chain, and none of it comes from the shocks.</p>
+<div id="a7316cd2" class="cell" data-execution_count="57">
 <div class="cell-output cell-output-stdout">
-<pre><code>[ 0.01427949  0.00779782 -0.00750212 ... -0.0145415  -0.00311308
-  0.13595884]</code></pre>
+<pre><code>[-0.00070386 -0.0209455  -0.00976074 ...  0.00720608 -0.06224522
+  0.04484166]</code></pre>
 </div>
 </div>
-<div id="ac36dce5" class="cell" data-execution_count="10">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>synth_return <span class="op">=</span> pd.DataFrame(log_return_array, columns <span class="op">=</span> [<span class="st">"Log_Return"</span>])</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>weekly_index <span class="op">=</span> pd.date_range(start <span class="op">=</span> <span class="st">"2000-01-07"</span>, freq <span class="op">=</span> <span class="st">"W-FRI"</span>, periods <span class="op">=</span> <span class="bu">len</span>(synth_return))</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>synth_return.index <span class="op">=</span> weekly_index</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(synth_return.head())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="ac36dce5" class="cell" data-execution_count="58">
 <div class="cell-output cell-output-stdout">
 <pre><code>            Log_Return
-2000-01-07    0.014279
-2000-01-14    0.007798
-2000-01-21   -0.007502
-2000-01-28    0.003440
-2000-02-04    0.004494</code></pre>
+2000-01-07     -0.0007
+2000-01-14     -0.0209
+2000-01-21     -0.0098
+2000-01-28      0.0155
+2000-02-04     -0.0166</code></pre>
 </div>
 </div>
-<div id="1ac1791b" class="cell" data-execution_count="18">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>synth_return[<span class="st">"Rolling_Weekly_Volatility"</span>] <span class="op">=</span> synth_return[<span class="st">"Log_Return"</span>].rolling(window <span class="op">=</span> <span class="dv">26</span>).std()</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>synth_return[<span class="st">"Rolling_Annual_Volatility"</span>] <span class="op">=</span> synth_return[<span class="st">"Rolling_Weekly_Volatility"</span>] <span class="op">*</span> np.sqrt(<span class="dv">52</span>)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>synth_return[<span class="st">"Rolling_Weekly_Volatility"</span>]</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>max_vol <span class="op">=</span> synth_return[<span class="st">"Rolling_Annual_Volatility"</span>].<span class="bu">max</span>()</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>max_vol_date <span class="op">=</span> synth_return[<span class="st">"Rolling_Annual_Volatility"</span>].idxmax()</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>min_vol <span class="op">=</span> synth_return[<span class="st">"Rolling_Annual_Volatility"</span>].<span class="bu">min</span>()</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>min_vol_date <span class="op">=</span> synth_return[<span class="st">"Rolling_Annual_Volatility"</span>].idxmin()</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Minimum annual volatility: </span><span class="sc">{</span>min_vol<span class="sc">:.1%}</span><span class="ss"> on </span><span class="sc">{</span>min_vol_date<span class="sc">:</span><span class="op">%</span>Y<span class="op">-%</span>m<span class="op">-%</span>d<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Maximum annual volatility: </span><span class="sc">{</span>max_vol<span class="sc">:.1%}</span><span class="ss"> on </span><span class="sc">{</span>max_vol_date<span class="sc">:</span><span class="op">%</span>Y<span class="op">-%</span>m<span class="op">-%</span>d<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="1ac1791b" class="cell" data-execution_count="59">
 <div class="cell-output cell-output-stdout">
-<pre><code>Minimum annual volatility: 6.8% on 2002-08-02
-Maximum annual volatility: 37.4% on 2017-04-28</code></pre>
+<pre><code>Minimum annual volatility: 7.0% on 2007-10-05
+Maximum annual volatility: 35.1% on 2010-01-15</code></pre>
 </div>
 </div>
-<div id="25442337" class="cell" data-execution_count="21">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>)) </span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>plt.plot(synth_return.index, synth_return[<span class="st">"Rolling_Annual_Volatility"</span>], color<span class="op">=</span><span class="st">"red"</span>, label<span class="op">=</span><span class="st">"Rolling_Volatility"</span>)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"SPY Annual Rolling Volatility"</span>)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Time"</span>)</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Volatility"</span>)</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>plt.show() </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><a href="#fig-synth-vol" class="quarto-xref">Figure&nbsp;2</a> shows annualised volatility of the synthetic series over a trailing 26-week window, the same window used in Report 1. It moves between about 7% and 35%. The shape is the point rather than the level: volatility does not sit still, it rises and falls in episodes, even though the shocks themselves are independent. Persistence in <span class="math inline">\(S_t\)</span> is enough to produce that. The range is narrower than in SPY, where the same measure reached 54%.</p>
+<div id="cell-fig-synth-vol" class="cell" data-execution_count="60">
 <div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="markov_02_files/figure-html/cell-11-output-1.png" class="img-fluid figure-img"></p>
+<div id="fig-synth-vol" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-synth-vol-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="markov_02_files/figure-html/fig-synth-vol-output-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-synth-vol-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Annualised volatility of the synthetic series over a trailing 26-week window.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<div id="a8e34b74" class="cell" data-execution_count="22">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>log_returns <span class="op">=</span> synth_return[<span class="st">"Log_Return"</span>].dropna()</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>mu <span class="op">=</span> log_returns.mean()</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>std <span class="op">=</span> log_returns.std()</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>,<span class="fl">3.5</span>))</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>plt.hist(log_returns, bins<span class="op">=</span><span class="dv">100</span>, density<span class="op">=</span><span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.6</span>, color<span class="op">=</span><span class="st">'blue'</span>, label<span class="op">=</span><span class="st">'Empirical'</span>)</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>xmin, xmax <span class="op">=</span> plt.xlim()</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(xmin, xmax, <span class="dv">100</span>)</span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> stats.norm.pdf(x, mu, std)</span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>plt.plot(x, p, linewidth<span class="op">=</span><span class="dv">2</span>, color<span class="op">=</span><span class="st">"red"</span>, label<span class="op">=</span><span class="st">"Gaussian Distribution"</span>)</span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Weekly log return"</span>)</span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Density"</span>)</span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">5</span>,<span class="fl">4.5</span>))</span>
-<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>stats.probplot(log_returns, dist<span class="op">=</span><span class="st">"norm"</span>, plot<span class="op">=</span>ax)</span>
-<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>kurtosis_degeri <span class="op">=</span> log_returns.kurtosis()</span>
-<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Excess Kurtosis Value: </span><span class="sc">{</span>kurtosis_degeri<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="markov_02_files/figure-html/cell-12-output-1.png" class="img-fluid figure-img"></p>
+<p><a href="#fig-synth-dist" class="quarto-xref">Figure&nbsp;3</a> compares the synthetic returns with a single fitted Gaussian and with the two-component mixture implied by the model. The histogram is more peaked in the centre and heavier in the tails than the Gaussian, and it tracks the mixture curve instead. The quantile plot shows the same thing from the other side: the points follow the reference line through the middle and leave it at both ends.</p>
+<p>The measured excess kurtosis is 5.03. This is clearly positive, which is the qualitative result the report is after, but it sits below the theoretical 6.75 derived in Section 2.3. The gap is sampling noise, not a modelling error. Kurtosis is a fourth-moment statistic and needs a long sample to settle down, and 1043 weeks is not long. The 50,000-week run in Section 5.2 gives 6.84, which is close to the theoretical value.</p>
+<div id="fig-synth-dist" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-synth-dist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-synth-dist" style="flex-basis: 100.0%;justify-content: flex-start;">
+<div id="fig-synth-dist-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-synth-dist-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="markov_02_files/figure-html/fig-synth-dist-output-1.png" class="img-fluid figure-img" data-ref-parent="fig-synth-dist">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-synth-dist-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Histogram against a fitted Gaussian and the implied two-component mixture.
+</figcaption>
 </figure>
 </div>
 </div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="markov_02_files/figure-html/cell-12-output-2.png" class="img-fluid figure-img"></p>
+</div>
+<div class="quarto-layout-row">
+<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-synth-dist" style="flex-basis: 100.0%;justify-content: flex-start;">
+<div id="fig-synth-dist-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-synth-dist-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="markov_02_files/figure-html/fig-synth-dist-output-2.png" class="img-fluid figure-img" data-ref-parent="fig-synth-dist">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-synth-dist-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Normal quantile-quantile plot.
+</figcaption>
 </figure>
 </div>
 </div>
+</div>
+<div class="quarto-layout-row">
+<div class="cell-output cell-output-stdout quarto-layout-cell" style="flex-basis: 100.0%;justify-content: flex-start;">
+<pre><code>Excess Kurtosis Value: 5.03</code></pre>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-synth-dist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Distribution of the synthetic weekly log returns.
+</figcaption>
+</figure>
+</div>
+<p><a href="#fig-synth-acf" class="quarto-xref">Figure&nbsp;4</a> repeats the three autocorrelation plots from Report 1 on the synthetic data. Raw returns show no meaningful autocorrelation, which is the expected result: the direction of a return depends only on the independent shock. Absolute and squared returns show positive autocorrelation at short lags, because a week in the high-variance state is likely to be followed by another one. The model therefore separates directional memory from magnitude memory in the same way the real data do.</p>
+<div id="fig-synth-acf" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-synth-acf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-synth-acf" style="flex-basis: 100.0%;justify-content: flex-start;">
+<div id="fig-synth-acf-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-synth-acf-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="markov_02_files/figure-html/fig-synth-acf-output-1.png" class="img-fluid figure-img" data-ref-parent="fig-synth-acf">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-synth-acf-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Raw returns.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row">
+<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-synth-acf" style="flex-basis: 100.0%;justify-content: flex-start;">
+<div id="fig-synth-acf-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-synth-acf-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="markov_02_files/figure-html/fig-synth-acf-output-2.png" class="img-fluid figure-img" data-ref-parent="fig-synth-acf">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-synth-acf-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Absolute returns.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row">
+<div class="cell-output cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-synth-acf" style="flex-basis: 100.0%;justify-content: flex-start;">
+<div id="fig-synth-acf-3" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-synth-acf-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="markov_02_files/figure-html/fig-synth-acf-output-3.png" class="img-fluid figure-img" data-ref-parent="fig-synth-acf">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-synth-acf-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(c) Squared returns.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-synth-acf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Autocorrelation of the synthetic weekly log returns, up to 52 lags.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="comparison-with-spy" class="level3">
+<h3 class="anchored" data-anchor-id="comparison-with-spy">5.2 Comparison with SPY</h3>
+<p>The table below places SPY next to two synthetic samples. The first has the same length as the SPY sample, 1043 weeks, and shows what one 20-year path of the model looks like. The second has 50,000 weeks and shows what the model does once sampling noise is removed. Comparing the two columns is also a way of seeing how much of a difference sample size alone can make.</p>
+<div id="724a5a15" class="cell" data-execution_count="63">
 <div class="cell-output cell-output-stdout">
-<pre><code>Excess Kurtosis Value: 6.10</code></pre>
+<pre><code>
+--- STANDARD DEVIATION CHECK ---
+Theoretical Std (Mixture Formula): 0.026000
+SPY Empirical Std                : 0.024140
+Synthetic 1042 Std               : 0.026519
+Synthetic 50000 Std              : 0.026254
+
+                  Weekly Std  Excess Kurtosis  ACF(r) lag1  ACF(|r|) lag1  \
+SPY 2000-2019         0.0241           9.4766      -0.0692         0.2997   
+Synthetic 1042n       0.0265           5.0342      -0.0431         0.2826   
+Synthetic 50000n      0.0263           6.8440      -0.0034         0.2920   
+
+                  ACF(|r|) lag5  ACF(|r|) lag10  
+SPY 2000-2019            0.2013          0.0993  
+Synthetic 1042n          0.1275         -0.0185  
+Synthetic 50000n         0.0989          0.0256  </code></pre>
 </div>
 </div>
-<div id="ceabfbe6" class="cell" data-execution_count="23">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> series, title <span class="kw">in</span> [(log_returns, <span class="st">"Raw ACF"</span>),</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>                      (log_returns.<span class="bu">abs</span>(), <span class="st">"Absolute ACF"</span>),</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>                      (log_returns <span class="op">**</span> <span class="dv">2</span>, <span class="st">"Squared ACF"</span>)]:</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">2.6</span>))</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    plot_acf(series, lags<span class="op">=</span><span class="dv">52</span>, ax<span class="op">=</span>ax, title<span class="op">=</span>title)</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    ax.set_ylim(<span class="op">-</span><span class="fl">0.2</span>, <span class="fl">0.45</span>)</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="markov_02_files/figure-html/cell-13-output-1.png" class="img-fluid figure-img"></p>
-</figure>
+<p>Three results stand out.</p>
+<p>First, the overall size of the returns is about right. The model implies a weekly standard deviation of 0.026, the long synthetic sample gives 0.0263, and SPY gives 0.0241. Since <span class="math inline">\(\sigma_0\)</span> and <span class="math inline">\(\sigma_1\)</span> were chosen by eye, this says that the guess was reasonable. It is not evidence for the model.</p>
+<p>Second, every stylised fact has the correct sign. Raw-return autocorrelation at lag 1 is near zero in both series. Absolute-return autocorrelation at lag 1 is 0.292 in the long synthetic sample against 0.300 in SPY, which is almost an exact match.</p>
+<p>Third, and this is the main failure, the memory fades too quickly. At lag 5 SPY still shows 0.201 while the model gives 0.099, and at lag 10 SPY shows 0.099 while the model gives 0.026. Excess kurtosis tells a related story: 6.84 against 9.48. The model produces volatility clustering, but the clustering is shorter and milder than the market shows.</p>
+<p>The short synthetic sample is noisier than the long one in every column. Its excess kurtosis is 5.03 rather than 6.84 and its lag-10 autocorrelation is slightly negative. This is a useful reminder that a single 20-year sample, including the SPY sample itself, carries a fair amount of noise in these statistics.</p>
+</section>
+</section>
+<section id="sensitivity" class="level2">
+<h2 class="anchored" data-anchor-id="sensitivity">6. Sensitivity</h2>
+<p>Section 5 used one set of parameters. This section changes them and asks a narrower question: which feature of the output responds to which parameter? Five scenarios are run over 50,000 weeks each, with the seeds fixed, so the differences between rows come from the parameters and not from the random draws.</p>
+<div id="e9f0cbba" class="cell" data-execution_count="64">
+<div class="cell-output cell-output-stdout">
+<pre><code>                      P_00   P_11  Vol_Low  Vol_High    Std  Excess Kurtosis  \
+Scenario                                                                       
+1. Base Case        0.9500 0.8000   0.0130    0.0520 0.0261           6.8310   
+2. High Persistence 0.9900 0.9500   0.0130    0.0520 0.0247           7.3801   
+3. Low Persistence  0.5000 0.5000   0.0130    0.0520 0.0377           2.3167   
+4. Extreme High Vol 0.9500 0.8000   0.0130    0.1200 0.0551          10.7556   
+5. Similar Vols     0.9500 0.8000   0.0130    0.0180 0.0141           0.3096   
+
+                     ACF(|r|) lag1  ACF(|r|) lag10  
+Scenario                                            
+1. Base Case                0.2969          0.0279  
+2. High Persistence         0.3688          0.2103  
+3. Low Persistence          0.0008         -0.0022  
+4. Extreme High Vol         0.3929          0.0383  
+5. Similar Vols             0.0295         -0.0003  </code></pre>
 </div>
 </div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="markov_02_files/figure-html/cell-13-output-2.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="markov_02_files/figure-html/cell-13-output-3.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
+<p>The two groups of parameters do different jobs.</p>
+<p>The volatility gap controls the tails. Widening it (Scenario 4, <span class="math inline">\(\sigma_1 = 0.120\)</span>) raises excess kurtosis from 6.83 to 10.76, which now overshoots the SPY value of 9.48. Closing it (Scenario 5, <span class="math inline">\(\sigma_1 = 0.018\)</span>) drops kurtosis to 0.31, near the Gaussian value of zero. When the two variances are almost equal, the mixture is no longer really a mixture, so the fat tails disappear.</p>
+<p>The transition probabilities control the memory. Raising persistence (Scenario 2, <span class="math inline">\(p_{00}=0.99\)</span> and <span class="math inline">\(p_{11}=0.95\)</span>) lifts the lag-10 absolute autocorrelation from 0.028 to 0.210, well above the SPY value of 0.099. Removing persistence (Scenario 3, both probabilities 0.5) destroys the clustering completely: absolute autocorrelation falls to zero at every lag. The regime still switches in that scenario, but the switching is no longer predictable, so there is no memory left to detect.</p>
+<p>The separation is not perfect, because the transition probabilities also move the stationary distribution. In Scenario 2 the chain spends about 17% of its time in the high state instead of 20%, and kurtosis moves a little as a result (6.83 to 7.38). In Scenario 3 it spends half of its time there, which balances the mixture and pulls kurtosis down to 2.32. Persistence mainly drives memory, but it reaches the tails through <span class="math inline">\(\boldsymbol{\pi}\)</span> as well.</p>
+<p>Scenario 4 also exposes a tension. Raising <span class="math inline">\(\sigma_1\)</span> brings kurtosis to a realistic level, but it also raises the weekly standard deviation to 0.055, more than twice the SPY value of 0.024. A parameter set cannot be judged one statistic at a time.</p>
+</section>
+<section id="discussion" class="level2">
+<h2 class="anchored" data-anchor-id="discussion">7. Discussion</h2>
+<p>The mechanism works in the qualitative sense. A two-state chain with a common mean and two variances produces near-zero autocorrelation in raw returns, positive autocorrelation in absolute returns, and positive excess kurtosis. These are exactly the three facts Report 1 measured in SPY, and none of them were put into the model by hand. They follow from the structure: independent shocks give no directional memory, a persistent state gives magnitude memory, and mixing two variances gives fat tails. The question that opened this report therefore has a positive answer.</p>
+<p>The quantitative match fails in one specific place. The model’s volatility memory is too short. SPY keeps a lag-10 absolute autocorrelation of 0.099 while the model gives 0.026. Section 6 shows that this can be repaired by raising <span class="math inline">\(p_{00}\)</span> and <span class="math inline">\(p_{11}\)</span>, but the repair is not free: Scenario 2 overshoots at lag 10 and still does not reach the observed kurtosis.</p>
+<p>There are at least three reasons why the fit is incomplete.</p>
+<ol type="1">
+<li>The parameters were chosen by eye rather than estimated. Section 6 shows that the results move a great deal with the parameters, so this alone could account for the gap.</li>
+<li>Two states may be too few. Real volatility does not look like two levels, it looks like a range. More states, or a continuous variance process, would give the model more room to match the slow decay of the autocorrelation.</li>
+<li>Normality within each regime is assumed and was never tested. If the true conditional distribution has heavier tails, the model needs a wider volatility gap to reach the same kurtosis.</li>
+</ol>
+<p>The important limit of this report is that it cannot separate the first reason from the other two. A poor fit caused by a bad parameter guess and a poor fit caused by the wrong structure look identical from here. Only estimation, choosing the parameters to maximise the likelihood of the actual SPY data, makes that separation possible. Until then the honest conclusion is a narrow one: the two-state mechanism can produce the stylised facts, and nothing in this report shows that it is the mechanism behind SPY.</p>
+</section>
+<section id="limitations" class="level2">
+<h2 class="anchored" data-anchor-id="limitations">8. Limitations</h2>
+<ul>
+<li>The parameters were set by hand. At no point was the model confronted with the SPY data.</li>
+<li>Every result rests on a single simulated path. There is no Monte Carlo repetition, so none of the numbers carry an error band.</li>
+<li>The 1043-week sample is short for kurtosis and for autocorrelation at long lags. The distance between 5.03 and 6.84 in the two synthetic samples is caused by sample size alone.</li>
+<li>Conditional normality inside each regime is assumed and not tested.</li>
+<li>The regime sequence is known here because it was generated. In real data it is hidden, which is a considerably harder problem and is not addressed.</li>
+</ul>
+</section>
+<section id="next-step" class="level2">
+<h2 class="anchored" data-anchor-id="next-step">9. Next Step</h2>
+<p>The next report estimates the parameters instead of choosing them. The Gaussian mixture likelihood, and then the Markov-switching likelihood, will be maximised on the SPY training sample, which produces <span class="math inline">\(\mu\)</span>, <span class="math inline">\(\sigma_0\)</span>, <span class="math inline">\(\sigma_1\)</span>, <span class="math inline">\(p_{00}\)</span> and <span class="math inline">\(p_{11}\)</span> from the data rather than from inspection of a chart.</p>
+<p>Two things follow. The fit gap in Section 5.2 can then be attributed either to the parameters or to the structure, which this report could not do. And the state sequence, which was observed by construction here, can be inferred from the returns through the filtered probabilities. That is the question left open at the end of Report 1: whether a high-volatility regime can be detected while it is happening.</p>
+</section>
 
 </main>
 <!-- /main column -->
